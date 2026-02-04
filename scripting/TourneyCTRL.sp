@@ -28,6 +28,8 @@ int g_ServerPort;
 
 int g_MinPlayers;
 int g_MaxPlayers;
+float g_TeamJoinTimeoutSeconds = 600.0;
+Handle g_TeamJoinTimeoutTimer = null;
 
 char g_MatchId[128];
 char g_RoundId[128];

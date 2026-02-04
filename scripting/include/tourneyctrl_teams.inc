@@ -35,6 +35,92 @@ int AmountOfPlayersInTeam(TFTeam team)
   return count;
 }
 
+void CancelTeamJoinTimeout()
+{
+  if (g_TeamJoinTimeoutTimer != null)
+  {
+    KillTimer(g_TeamJoinTimeoutTimer);
+    g_TeamJoinTimeoutTimer = null;
+  }
+}
+
+void UpdateTeamJoinTimeout()
+{
+  if (g_TeamJoinTimeoutSeconds <= 0.0 || g_MaxPlayers == 0 || g_GameFinished)
+  {
+    CancelTeamJoinTimeout();
+    return;
+  }
+
+  int redCount = AmountOfPlayersInTeam(TFTeam_Red);
+  int blueCount = AmountOfPlayersInTeam(TFTeam_Blue);
+
+  bool redFull = redCount >= g_MaxPlayers;
+  bool blueFull = blueCount >= g_MaxPlayers;
+
+  if (redFull && blueFull)
+  {
+    CancelTeamJoinTimeout();
+    return;
+  }
+
+  if ((redFull && !blueFull) || (blueFull && !redFull))
+  {
+    if (g_TeamJoinTimeoutTimer == null)
+    {
+      g_TeamJoinTimeoutTimer = CreateTimer(g_TeamJoinTimeoutSeconds, Timer_TeamJoinTimeout);
+    }
+    return;
+  }
+
+  CancelTeamJoinTimeout();
+}
+
+public Action Timer_TeamJoinTimeout(Handle timer, any data)
+{
+  g_TeamJoinTimeoutTimer = null;
+
+  if (g_TeamJoinTimeoutSeconds <= 0.0 || g_MaxPlayers == 0 || g_GameFinished)
+  {
+    return Plugin_Stop;
+  }
+
+  int redCount = AmountOfPlayersInTeam(TFTeam_Red);
+  int blueCount = AmountOfPlayersInTeam(TFTeam_Blue);
+
+  bool redFull = redCount >= g_MaxPlayers;
+  bool blueFull = blueCount >= g_MaxPlayers;
+
+  if ((redFull && !blueFull) || (blueFull && !redFull))
+  {
+    char missingName[255];
+    char winnerName[255];
+    TFTeam winnerTeam;
+    TFTeam loserTeam;
+    if (redFull && !blueFull)
+    {
+      winnerTeam = TFTeam_Red;
+      loserTeam = TFTeam_Blue;
+      g_CvarBlueTeamName.GetString(missingName, sizeof(missingName));
+      g_CvarRedTeamName.GetString(winnerName, sizeof(winnerName));
+    }
+    else
+    {
+      winnerTeam = TFTeam_Blue;
+      loserTeam = TFTeam_Red;
+      g_CvarRedTeamName.GetString(missingName, sizeof(missingName));
+      g_CvarBlueTeamName.GetString(winnerName, sizeof(winnerName));
+    }
+
+    CPrintToChatAll("Team %s did not join in time. Team %s wins by forfeit.", missingName, winnerName);
+    SetTeamScore(view_as<int>(winnerTeam), 10);
+    SetTeamScore(view_as<int>(loserTeam), 0);
+    ServerCommand("mp_forcewin %i", view_as<int>(winnerTeam));
+  }
+
+  return Plugin_Stop;
+}
+
 public Action Timer_CheckPlayerTeams(Handle timer, any data)
 {
   int realPlayers = 0;
@@ -92,6 +178,8 @@ public Action Timer_CheckPlayerTeams(Handle timer, any data)
     StopRecord();
     ArchiveDemoFile();
   }
+
+  UpdateTeamJoinTimeout();
 
   return Plugin_Continue;
 }

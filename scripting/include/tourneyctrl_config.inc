@@ -23,6 +23,7 @@ void LoadTourneyConfig()
   kv.GetString("api_send_scores_url", g_ApiSendScoresUrl, sizeof(g_ApiSendScoresUrl), "");
   kv.GetString("api_player_stats_url", g_ApiPlayerStatsUrl, sizeof(g_ApiPlayerStatsUrl), "");
   kv.GetString("api_secret", g_ApiSecret, sizeof(g_ApiSecret), "");
+  g_TeamJoinTimeoutSeconds = kv.GetFloat("team_join_timeout_seconds", 600.0);
 
   delete kv;
 
