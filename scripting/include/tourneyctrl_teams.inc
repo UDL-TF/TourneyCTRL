@@ -95,27 +95,19 @@ public Action Timer_TeamJoinTimeout(Handle timer, any data)
   {
     char missingName[255];
     char winnerName[255];
-    TFTeam winnerTeam;
-    TFTeam loserTeam;
     if (redFull && !blueFull)
     {
-      winnerTeam = TFTeam_Red;
-      loserTeam = TFTeam_Blue;
       g_CvarBlueTeamName.GetString(missingName, sizeof(missingName));
       g_CvarRedTeamName.GetString(winnerName, sizeof(winnerName));
     }
     else
     {
-      winnerTeam = TFTeam_Blue;
-      loserTeam = TFTeam_Red;
       g_CvarRedTeamName.GetString(missingName, sizeof(missingName));
       g_CvarBlueTeamName.GetString(winnerName, sizeof(winnerName));
     }
 
-    CPrintToChatAll("Team %s did not join in time. Team %s wins by forfeit.", missingName, winnerName);
-    SetTeamScore(view_as<int>(winnerTeam), 10);
-    SetTeamScore(view_as<int>(loserTeam), 0);
-    ServerCommand("mp_forcewin %i", view_as<int>(winnerTeam));
+    CPrintToChatAll("Team %s did not join in time. Team %s waited %i seconds. Red: %i/%i, Blue: %i/%i.", missingName, winnerName, RoundToFloor(g_TeamJoinTimeoutSeconds), redCount, g_MaxPlayers, blueCount, g_MaxPlayers);
+    LogMessage("Join timeout: missing team %s; waiting team %s; Red %i/%i; Blue %i/%i; timeout %i seconds.", missingName, winnerName, redCount, g_MaxPlayers, blueCount, g_MaxPlayers, RoundToFloor(g_TeamJoinTimeoutSeconds));
   }
 
   return Plugin_Stop;
