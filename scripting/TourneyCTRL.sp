@@ -68,12 +68,12 @@ char g_ApiSecret[128];
 #define CurrentRecording g_CurrentRecording
 
 #include <udl>
-#include "tourneyctrl_config"
-#include "tourneyctrl_util"
-#include "tourneyctrl_recording"
-#include "tourneyctrl_teams"
-#include "tourneyctrl_stats"
-#include "tourneyctrl_web"
+#include <tourneyctrl_config>
+#include <tourneyctrl_util>
+#include <tourneyctrl_recording>
+#include <tourneyctrl_teams>
+#include <tourneyctrl_stats>
+#include <tourneyctrl_web>
 
 public Plugin myinfo =
 {
@@ -81,7 +81,7 @@ public Plugin myinfo =
   author      = "Tolfx",
   description = "Tournament Control Plugin",
   version     = "2.0.0",
-  url         = "https://github.com/Tolfx/TourneyCTRL"
+  url         = "https://github.com/UDL-TF/TourneyCTRL"
 };
 
 public void OnPluginStart()
