@@ -73,6 +73,7 @@ char g_ApiSecret[128];
 #include <tourneyctrl_config>
 #include <tourneyctrl_util>
 #include <tourneyctrl_recording>
+#include <sourcetvmanager>
 #include <tourneyctrl_teams>
 #include <tourneyctrl_stats>
 #include <tourneyctrl_web>
@@ -128,7 +129,7 @@ public void OnPluginStart()
   }
 
   AssignPlayersToTeams();
-  GetIp();
+  //GetIp();  // According to Tolfx this doesn't work
 
   CreateTimer(1.0, Timer_CheckPlayerTeams, _, TIMER_REPEAT);
   CreateTimer(5.0, Timer_CheckWinLimitCorrector, _, TIMER_REPEAT);
@@ -235,7 +236,15 @@ public Action CommandRecord(int client, int args)
     return Plugin_Handled;
   }
 
-  StartRecord();
+  if (!g_CvarTvEnabled.BoolValue)
+  {
+    return Plugin_Handled;
+  }
+
+  char recordName[PLATFORM_MAX_PATH];
+  GetRecordName(recordName, sizeof(recordName));
+
+  SourceTV_StartRecording(recordName);
 
   CPrintToChat(client, "%t", "tc_started_recording", g_CurrentRecording);
 
@@ -250,7 +259,12 @@ public Action CommandStopRecord(int client, int args)
     return Plugin_Handled;
   }
 
-  StopRecord();
+  if (!g_CvarTvEnabled.BoolValue)
+  {
+    return Plugin_Handled;
+  }
+
+  SourceTV_StopRecording();
 
   CPrintToChat(client, "%t", "tc_stopped_recording", g_CurrentRecording);
 
@@ -314,7 +328,7 @@ public Action OnGameOver(Event event, char[] eventName, bool dontBroadcast)
   }
 
   AnnounceWinner(winner, loser);
-  StopRecord();
+  SourceTV_StopRecording();
   UploadDemoFile();
 
   // Send player stats to backend
