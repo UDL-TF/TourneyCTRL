@@ -167,7 +167,7 @@ public Action Timer_CheckPlayerTeams(Handle timer, any data)
   if (g_IsRecording && !g_GameFinished && realPlayers == 0)
   {
     LogMessage("All players left. Stopping recording and archiving demo.");
-    StopRecord();
+    SourceTV_StopRecording();
     ArchiveDemoFile();
   }
 
@@ -227,8 +227,13 @@ public Action OnTournamentStateUpdate(Event event, const char[] eventName, bool 
 
   if (readyState)
   {
-    StartRecord();
+    char recordName[PLATFORM_MAX_PATH];
+    GetRecordName(recordName, sizeof(recordName));
+
+    SourceTV_StartRecording(recordName);
+
     CPrintToChatAll("%t", "tc_readyup");
+    
     if (AmountOfPlayersInTeam(TFTeam_Red) < g_MinPlayers)
     {
       CPrintToChatAll("Team %s does not have enough players to ready up.", redName);
