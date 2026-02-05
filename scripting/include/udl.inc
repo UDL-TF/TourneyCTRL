@@ -13,7 +13,7 @@ public Action
   return Plugin_Stop;
 }
 
-void GetIp(int maxTries = 0, int currentTry = 0)
+/*void GetIp(int maxTries = 0, int currentTry = 0)
 {
   PrintToServer("Attempt to get public IP... (Try %d)", currentTry + 1);
   int ipaddress[4];
@@ -38,7 +38,7 @@ void GetIp(int maxTries = 0, int currentTry = 0)
   Format(PublicIp, 32, "%d.%d.%d.%d", ipaddress[0], ipaddress[1], ipaddress[2], ipaddress[3]);
   ServerPort = GetConVarInt(FindConVar("hostport"));
   PrintToServer("Public IP obtained: %s", PublicIp);
-}
+}*/
 
 public void OnDemoUploadCompleted(HTTPStatus status, any value)
 {
