@@ -214,8 +214,6 @@ public void OnClientPostAdminCheck(int client)
   {
     KickClient(client, "You are not allowed to join this match.");
   }
-
-  SourceTvStatus();
 }
 
 public Action CommandResetAssigned(int client, int args)
@@ -290,8 +288,6 @@ public Action OnRoundStart(Event event, char[] eventName, bool dontBroadcast)
   int bestOf = g_CvarWinLimit.IntValue;
 
   CPrintToChatAll("%t", "tc_roundstart", redTeamName, blueTeamName, bestOf);
-
-  SourceTvStatus();
 
   return Plugin_Handled;
 }
@@ -386,21 +382,4 @@ public Action Timer_KickPlayers(Handle timer, any data)
   }
 
   return Plugin_Stop;
-}
-
-public void SourceTvStatus()
-{
-  // Ensure MaxClients is valid
-  if (MaxClients <= 0)
-  {
-    return;
-  }
-
-  for (int client = 1; client <= MaxClients; client++)
-  {
-    if (IsClientSourceTV(client))
-    {
-      FakeClientCommand(client, "status");
-    }
-  }
 }
