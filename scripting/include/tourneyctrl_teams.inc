@@ -211,8 +211,6 @@ public Action OnPlayerTeam(Event event, const char[] eventName, bool dontBroadca
     }
   }
 
-  SourceTvStatus();
-
   return Plugin_Continue;
 }
 
