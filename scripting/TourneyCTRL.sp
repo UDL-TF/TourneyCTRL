@@ -73,6 +73,7 @@ char g_ApiSecret[128];
 #include <tourneyctrl_config>
 #include <tourneyctrl_util>
 #include <tourneyctrl_recording>
+#include <sourcetvmanager>
 #include <tourneyctrl_teams>
 #include <tourneyctrl_stats>
 #include <tourneyctrl_web>
@@ -128,7 +129,7 @@ public void OnPluginStart()
   }
 
   AssignPlayersToTeams();
-  GetIp();
+  //GetIp();  // According to Tolfx this doesn't work
 
   CreateTimer(1.0, Timer_CheckPlayerTeams, _, TIMER_REPEAT);
   CreateTimer(5.0, Timer_CheckWinLimitCorrector, _, TIMER_REPEAT);
@@ -213,8 +214,6 @@ public void OnClientPostAdminCheck(int client)
   {
     KickClient(client, "You are not allowed to join this match.");
   }
-
-  SourceTvStatus();
 }
 
 public Action CommandResetAssigned(int client, int args)
@@ -235,7 +234,15 @@ public Action CommandRecord(int client, int args)
     return Plugin_Handled;
   }
 
-  StartRecord();
+  if (!g_CvarTvEnabled.BoolValue)
+  {
+    return Plugin_Handled;
+  }
+
+  char recordName[PLATFORM_MAX_PATH];
+  GetRecordName(recordName, sizeof(recordName));
+
+  SourceTV_StartRecording(recordName);
 
   CPrintToChat(client, "%t", "tc_started_recording", g_CurrentRecording);
 
@@ -250,7 +257,12 @@ public Action CommandStopRecord(int client, int args)
     return Plugin_Handled;
   }
 
-  StopRecord();
+  if (!g_CvarTvEnabled.BoolValue)
+  {
+    return Plugin_Handled;
+  }
+
+  SourceTV_StopRecording();
 
   CPrintToChat(client, "%t", "tc_stopped_recording", g_CurrentRecording);
 
@@ -276,8 +288,6 @@ public Action OnRoundStart(Event event, char[] eventName, bool dontBroadcast)
   int bestOf = g_CvarWinLimit.IntValue;
 
   CPrintToChatAll("%t", "tc_roundstart", redTeamName, blueTeamName, bestOf);
-
-  SourceTvStatus();
 
   return Plugin_Handled;
 }
@@ -314,7 +324,7 @@ public Action OnGameOver(Event event, char[] eventName, bool dontBroadcast)
   }
 
   AnnounceWinner(winner, loser);
-  StopRecord();
+  SourceTV_StopRecording();
   UploadDemoFile();
 
   // Send player stats to backend
@@ -372,21 +382,4 @@ public Action Timer_KickPlayers(Handle timer, any data)
   }
 
   return Plugin_Stop;
-}
-
-public void SourceTvStatus()
-{
-  // Ensure MaxClients is valid
-  if (MaxClients <= 0)
-  {
-    return;
-  }
-
-  for (int client = 1; client <= MaxClients; client++)
-  {
-    if (IsClientSourceTV(client))
-    {
-      FakeClientCommand(client, "status");
-    }
-  }
 }
