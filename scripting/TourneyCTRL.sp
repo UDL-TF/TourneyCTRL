@@ -100,8 +100,6 @@ public void OnPluginStart()
   HookEvent("teamplay_round_start", OnRoundStart);
   HookEvent("tf_game_over", OnGameOver);
   HookEvent("tournament_stateupdate", OnTournamentStateUpdate, EventHookMode_Pre);
-  HookEvent("player_spawn", OnPlayerSpawn, EventHookMode_Post);
-  HookEvent("player_death", OnPlayerDeath, EventHookMode_Post);
 
   LoadTourneyConfig();
   LoadMatchEnvironment();
