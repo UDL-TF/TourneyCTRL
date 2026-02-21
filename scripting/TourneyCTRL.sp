@@ -129,7 +129,7 @@ public void OnPluginStart()
   }
 
   AssignPlayersToTeams();
-  //GetIp();  // According to Tolfx this doesn't work
+  GetIp();
 
   CreateTimer(1.0, Timer_CheckPlayerTeams, _, TIMER_REPEAT);
   CreateTimer(5.0, Timer_CheckWinLimitCorrector, _, TIMER_REPEAT);

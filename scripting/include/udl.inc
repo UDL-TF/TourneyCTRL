@@ -13,32 +13,13 @@ public Action
   return Plugin_Stop;
 }
 
-/*void GetIp(int maxTries = 0, int currentTry = 0)
+void GetIp(int maxTries = 0, int currentTry = 0)
 {
-  PrintToServer("Attempt to get public IP... (Try %d)", currentTry + 1);
   int ipaddress[4];
   SteamWorks_GetPublicIP(ipaddress);
-  if (!ipaddress[0] && !ipaddress[1] && !ipaddress[2] && !ipaddress[3])
-  {
-    if (currentTry < maxTries)
-    {
-      DataPack data = new DataPack();
-      data.WriteFunction(GetIp);
-      data.WriteCell(maxTries);
-      data.WriteCell(currentTry + 1);
-      CreateTimer(1.0, Timer_CallSingleFunction, data);
-    }
-    else
-    {
-      PrintToServer("Failed to get public IP after %d attempts.", maxTries);
-    }
-    return;
-  }
-
-  Format(PublicIp, 32, "%d.%d.%d.%d", ipaddress[0], ipaddress[1], ipaddress[2], ipaddress[3]);
+  Format(PublicIp, sizeof(PublicIp), "%d.%d.%d.%d", ipaddress[0], ipaddress[1], ipaddress[2], ipaddress[3]);
   ServerPort = GetConVarInt(FindConVar("hostport"));
-  PrintToServer("Public IP obtained: %s", PublicIp);
-}*/
+}
 
 public void OnDemoUploadCompleted(HTTPStatus status, any value)
 {
