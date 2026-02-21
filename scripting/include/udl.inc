@@ -21,18 +21,6 @@ void GetIp(int maxTries = 0, int currentTry = 0)
   ServerPort = GetConVarInt(FindConVar("hostport"));
 }
 
-public void OnDemoUploadCompleted(HTTPStatus status, any value)
-{
-  if (status == HTTPStatus_OK)
-  {
-    PrintToServer("Demo upload completed successfully.");
-  }
-  else
-  {
-    PrintToServer("Demo upload failed with status: %d", status);
-  }
-}
-
 public void OnWebHookExecuted(HTTPResponse response, DataPack pack)
 {
   if (response.Status == HTTPStatus_NoContent || response.Status == HTTPStatus_OK)
@@ -42,20 +30,6 @@ public void OnWebHookExecuted(HTTPResponse response, DataPack pack)
   else
   {
     PrintToServer("Webhook execution failed with status: %d", response.Status);
-    char responseBody[1024];
-    response.Data.ToString(responseBody, sizeof(responseBody));
-    PrintToServer("Response body: %s", responseBody);
-  }
-}
-
-public     void OnPlayerStatsPosted(HTTPResponse response, any value) {
-    if (response.Status == HTTPStatus_NoContent || response.Status == HTTPStatus_OK)
-  {
-    PrintToServer("executed successfully.");
-  }
-  else
-  {
-    PrintToServer("execution failed with status: %d", response.Status);
     char responseBody[1024];
     response.Data.ToString(responseBody, sizeof(responseBody));
     PrintToServer("Response body: %s", responseBody);

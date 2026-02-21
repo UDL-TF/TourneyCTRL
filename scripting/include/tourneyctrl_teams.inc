@@ -35,20 +35,20 @@ int AmountOfPlayersInTeam(TFTeam team)
   return count;
 }
 
-void CancelTeamJoinTimeout()
+void CancelMinuteAnnouncements()
 {
-  if (g_TeamJoinTimeoutTimer != null)
+  if (g_MinuteAnnouncementTimer != null)
   {
-    KillTimer(g_TeamJoinTimeoutTimer);
-    g_TeamJoinTimeoutTimer = null;
+    KillTimer(g_MinuteAnnouncementTimer);
+    g_MinuteAnnouncementTimer = null;
   }
 }
 
-void UpdateTeamJoinTimeout()
+void UpdateMinuteAnnouncements()
 {
-  if (g_TeamJoinTimeoutSeconds <= 0.0 || g_MaxPlayers == 0 || g_GameFinished)
+  if (g_MaxPlayers == 0 || g_GameFinished)
   {
-    CancelTeamJoinTimeout();
+    CancelMinuteAnnouncements();
     return;
   }
 
@@ -60,28 +60,27 @@ void UpdateTeamJoinTimeout()
 
   if (redFull && blueFull)
   {
-    CancelTeamJoinTimeout();
+    CancelMinuteAnnouncements();
     return;
   }
 
   if ((redFull && !blueFull) || (blueFull && !redFull))
   {
-    if (g_TeamJoinTimeoutTimer == null)
+    if (g_MinuteAnnouncementTimer == null)
     {
-      g_TeamJoinTimeoutTimer = CreateTimer(g_TeamJoinTimeoutSeconds, Timer_TeamJoinTimeout);
+      g_MinuteAnnouncementTimer = CreateTimer(60.0, Timer_MinuteAnnouncement, _, TIMER_REPEAT);
     }
     return;
   }
 
-  CancelTeamJoinTimeout();
+  CancelMinuteAnnouncements();
 }
 
-public Action Timer_TeamJoinTimeout(Handle timer, any data)
+public Action Timer_MinuteAnnouncement(Handle timer, any data)
 {
-  g_TeamJoinTimeoutTimer = null;
-
-  if (g_TeamJoinTimeoutSeconds <= 0.0 || g_MaxPlayers == 0 || g_GameFinished)
+  if (g_MaxPlayers == 0 || g_GameFinished)
   {
+    g_MinuteAnnouncementTimer = null;
     return Plugin_Stop;
   }
 
@@ -93,24 +92,25 @@ public Action Timer_TeamJoinTimeout(Handle timer, any data)
 
   if ((redFull && !blueFull) || (blueFull && !redFull))
   {
-    char missingName[255];
-    char winnerName[255];
+    char waitingName[255];
     if (redFull && !blueFull)
     {
-      g_CvarBlueTeamName.GetString(missingName, sizeof(missingName));
-      g_CvarRedTeamName.GetString(winnerName, sizeof(winnerName));
+      g_CvarRedTeamName.GetString(waitingName, sizeof(waitingName));
     }
     else
     {
-      g_CvarRedTeamName.GetString(missingName, sizeof(missingName));
-      g_CvarBlueTeamName.GetString(winnerName, sizeof(winnerName));
+      g_CvarBlueTeamName.GetString(waitingName, sizeof(waitingName));
     }
 
-    CPrintToChatAll("Team %s did not join in time. Team %s waited %i seconds. Red: %i/%i, Blue: %i/%i.", missingName, winnerName, RoundToFloor(g_TeamJoinTimeoutSeconds), redCount, g_MaxPlayers, blueCount, g_MaxPlayers);
-    LogMessage("Join timeout: missing team %s; waiting team %s; Red %i/%i; Blue %i/%i; timeout %i seconds.", missingName, winnerName, redCount, g_MaxPlayers, blueCount, g_MaxPlayers, RoundToFloor(g_TeamJoinTimeoutSeconds));
+    CPrintToChatAll("Waiting for teams to join. Red: %i/%i, Blue: %i/%i.", redCount, g_MaxPlayers, blueCount, g_MaxPlayers);
+    return Plugin_Continue;
   }
-
-  return Plugin_Stop;
+  else
+  {
+    // Both teams are either full or empty, stop the timer
+    g_MinuteAnnouncementTimer = null;
+    return Plugin_Stop;
+  }
 }
 
 public Action Timer_CheckPlayerTeams(Handle timer, any data)
@@ -171,7 +171,7 @@ public Action Timer_CheckPlayerTeams(Handle timer, any data)
     ArchiveDemoFile();
   }
 
-  UpdateTeamJoinTimeout();
+  UpdateMinuteAnnouncements();
 
   return Plugin_Continue;
 }

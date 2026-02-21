@@ -28,8 +28,7 @@ int g_ServerPort;
 
 int g_MinPlayers;
 int g_MaxPlayers;
-float g_TeamJoinTimeoutSeconds = 600.0;
-Handle g_TeamJoinTimeoutTimer = null;
+Handle g_MinuteAnnouncementTimer = null;
 
 char g_MatchId[128];
 char g_RoundId[128];
@@ -42,23 +41,11 @@ char g_WinLimit[64];
 ArrayList g_AssignedRedTeam;
 ArrayList g_AssignedBlueTeam;
 
-enum PlayerStatField
-{
-  PlayerStat_Kills,
-  PlayerStat_Deaths,
-  PlayerStat_Deflects,
-  PlayerStat_TimeAlive,
-  PlayerStat_LastSpawnTime
-};
-
-int g_PlayerStats[MAXPLAYERS + 1][PlayerStatField];
-
 char g_DiscordWebhookUrl[256];
 char g_DiscordUsername[64];
 char g_DiscordAvatarUrl[256];
-char g_ApiUploadDemoUrl[256];
 char g_ApiSendScoresUrl[256];
-char g_ApiPlayerStatsUrl[256];
+
 char g_ApiSecret[128];
 
 #define PublicIp g_PublicIp
@@ -325,11 +312,6 @@ public Action OnGameOver(Event event, char[] eventName, bool dontBroadcast)
 
   AnnounceWinner(winner, loser);
   SourceTV_StopRecording();
-  UploadDemoFile();
-
-  // Send player stats to backend
-  SendAllPlayerStatsToBackend();
-  ResetAllPlayerStats();
 
   g_GameFinished = true;
 
@@ -337,10 +319,10 @@ public Action OnGameOver(Event event, char[] eventName, bool dontBroadcast)
 
   return Plugin_Continue;
 }
-// Register event hooks for player stats
+// Clean up on map start
 public void OnMapStart()
 {
-  ResetAllPlayerStats();
+  // Any initialization logic can go here
 }
 public Action Timer_CheckWinLimitCorrector(Handle timer, any data)
 {

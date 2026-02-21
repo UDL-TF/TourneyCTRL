@@ -24,9 +24,7 @@
   - discord_webhook_url
   - discord_username
   - discord_avatar_url
-  - api_upload_demo_url
   - api_send_scores_url
-  - api_player_stats_url
   - api_secret
 - Required environment variables:
   - MATCH_ID
@@ -45,9 +43,9 @@
 - scripting/TourneyCTRL.sp: main plugin entry, events, timers, and shared globals.
 - scripting/include/tourneyctrl_config.inc: config loading and API secret helper.
 - scripting/include/tourneyctrl_util.inc: API retry helpers and request handlers.
-- scripting/include/tourneyctrl_recording.inc: demo recording, upload, and archive.
+- scripting/include/tourneyctrl_recording.inc: demo recording and archive.
 - scripting/include/tourneyctrl_teams.inc: team assignment, team enforcement, ready checks.
-- scripting/include/tourneyctrl_stats.inc: player stat tracking and upload.
+- scripting/include/tourneyctrl_stats.inc: player stat functionality removed.
 - scripting/include/tourneyctrl_web.inc: Discord webhook and score submission flow.
 - scripting/include/udl.inc: shared UDL helpers used across plugins.
 - addons/sourcemod/configs/tourneyctrl.cfg: required secrets and endpoints.
@@ -57,7 +55,7 @@
 ## Usage ##
 1. Ensure the environment variables are set before match start.
 2. The plugin will assign players, enforce teams, and start recording on ready-up.
-3. On match end, it posts scores and player stats, uploads the demo, and kicks players.
+3. On match end, it posts scores, archives the demo, and kicks players.
 4. Admin commands:
    - tc_record: start recording
    - tc_stoprecord: stop recording

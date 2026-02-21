@@ -3,11 +3,6 @@
 #endif
 #define _tourneyctrl_recording_included
 
-void UploadDemoFile()
-{
-  UploadDemoFileWithRetry(0);
-}
-
 void ArchiveDemoFile()
 {
   char filePath[PLATFORM_MAX_PATH];
