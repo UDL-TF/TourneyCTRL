@@ -30,9 +30,6 @@ public void OnWebHookExecuted(HTTPResponse response, DataPack pack)
   else
   {
     PrintToServer("Webhook execution failed with status: %d", response.Status);
-    char responseBody[1024];
-    response.Data.ToString(responseBody, sizeof(responseBody));
-    PrintToServer("Response body: %s", responseBody);
   }
 }
 

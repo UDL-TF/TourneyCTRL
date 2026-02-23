@@ -60,9 +60,6 @@ public void OnSendScoresCompleted(HTTPResponse response, any value)
   }
 
   PrintToServer("Request failed with status: %d", response.Status);
-  char responseBody[1024];
-  response.Data.ToString(responseBody, sizeof(responseBody));
-  PrintToServer("Response body: %s", responseBody);
 
   int nextAttempt = attempt + 1;
   delete pack;
