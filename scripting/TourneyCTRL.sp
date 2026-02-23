@@ -76,6 +76,13 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
+  // Unload conflicting map voting plugins
+  ServerCommand("sm plugins unload rockthevote");
+  ServerCommand("sm plugins unload nominations");
+  ServerCommand("sm plugins unload nextmap");
+  ServerCommand("sm plugins unload mapchooser");
+  LogMessage("Unloaded conflicting plugins: rockthevote, nominations, nextmap, mapchooser");
+
   LoadTranslations("tourneyctrl.phrase.txt");
 
   RegAdminCmd("tc_record", CommandRecord, ADMFLAG_GENERIC, "Starts recording a demo");
