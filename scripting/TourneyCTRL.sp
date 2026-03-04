@@ -98,17 +98,18 @@ public void OnPluginStart()
   g_AssignedBlueTeam = new ArrayList(10);
   g_AssignedRedTeam = new ArrayList(10);
 
-  if (!DirExists(g_DemoPath))
-  {
-    InitDirectory(g_DemoPath);
-  }
-
   HookEvent("player_team", OnPlayerTeam, EventHookMode_Pre);
   HookEvent("teamplay_round_start", OnRoundStart);
   HookEvent("tf_game_over", OnGameOver);
   HookEvent("tournament_stateupdate", OnTournamentStateUpdate, EventHookMode_Pre);
 
   LoadTourneyConfig();
+  
+  if (!DirExists(g_DemoPath))
+  {
+    InitDirectory(g_DemoPath);
+  }
+  
   LoadMatchEnvironment();
 
   if (g_WinLimit[0] != '\0')
@@ -233,8 +234,11 @@ public Action CommandRecord(int client, int args)
 
   char recordName[PLATFORM_MAX_PATH];
   GetRecordName(recordName, sizeof(recordName));
+  
+  char fullPath[PLATFORM_MAX_PATH];
+  Format(fullPath, sizeof(fullPath), "%s/%s", g_DemoPath, recordName);
 
-  SourceTV_StartRecording(recordName);
+  SourceTV_StartRecording(fullPath);
 
   CPrintToChat(client, "%t", "tc_started_recording", g_CurrentRecording);
 

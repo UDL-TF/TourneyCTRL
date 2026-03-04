@@ -227,8 +227,11 @@ public Action OnTournamentStateUpdate(Event event, const char[] eventName, bool 
   {
     char recordName[PLATFORM_MAX_PATH];
     GetRecordName(recordName, sizeof(recordName));
+    
+    char fullPath[PLATFORM_MAX_PATH];
+    Format(fullPath, sizeof(fullPath), "%s/%s", g_DemoPath, recordName);
 
-    SourceTV_StartRecording(recordName);
+    SourceTV_StartRecording(fullPath);
 
     CPrintToChatAll("%t", "tc_readyup");
     
