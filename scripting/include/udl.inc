@@ -13,7 +13,7 @@ public Action
   return Plugin_Stop;
 }
 
-void GetIp(int maxTries = 0, int currentTry = 0)
+void GetIp()
 {
   int ipaddress[4];
   SteamWorks_GetPublicIP(ipaddress);

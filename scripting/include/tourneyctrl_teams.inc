@@ -167,8 +167,10 @@ public Action Timer_CheckPlayerTeams(Handle timer, any data)
   if (SourceTV_IsRecording() && !g_GameFinished && realPlayers == 0)
   {
     LogMessage("All players left. Stopping recording and archiving demo.");
+    
     SourceTV_StopRecording();
     ArchiveDemoFile();
+    ServerCommand("mp_tournament_restart");
   }
 
   UpdateMinuteAnnouncements();
