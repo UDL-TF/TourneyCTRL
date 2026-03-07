@@ -17,7 +17,6 @@ ConVar g_CvarBlueTeamName;
 ConVar g_CvarWinLimit;
 ConVar g_CvarTvEnabled;
 
-bool g_IsRecording = false;
 bool g_GameFinished = false;
 
 char g_DemoPath[PLATFORM_MAX_PATH] = "demos";
@@ -211,6 +210,12 @@ public void OnClientPostAdminCheck(int client)
 
 public Action CommandResetAssigned(int client, int args)
 {
+  if (g_AssignedBlueTeam.Length < 1 && g_AssignedRedTeam.Length < 1)
+  {
+    CPrintToChat(client, "%t", "tc_reset_blocked");
+    return Plugin_Handled;
+  }
+
   g_AssignedRedTeam.Clear();
   g_AssignedBlueTeam.Clear();
 
@@ -221,14 +226,14 @@ public Action CommandResetAssigned(int client, int args)
 
 public Action CommandRecord(int client, int args)
 {
-  if (g_IsRecording)
+  if (SourceTV_IsRecording())
   {
     CPrintToChat(client, "%t", "tc_already_recording");
     return Plugin_Handled;
   }
-
-  if (!g_CvarTvEnabled.BoolValue)
+  else if (!g_CvarTvEnabled.BoolValue)
   {
+    CPrintToChat(client, "%t", "tc_recording_disabled");
     return Plugin_Handled;
   }
 
@@ -247,14 +252,14 @@ public Action CommandRecord(int client, int args)
 
 public Action CommandStopRecord(int client, int args)
 {
-  if (!g_IsRecording)
+  if (!SourceTV_IsRecording())
   {
     CPrintToChat(client, "%t", "tc_not_recording");
     return Plugin_Handled;
   }
-
-  if (!g_CvarTvEnabled.BoolValue)
+  else if (!g_CvarTvEnabled.BoolValue)
   {
+    CPrintToChat(client, "%t", "tc_recording_disabled");
     return Plugin_Handled;
   }
 
@@ -269,7 +274,9 @@ public Action CommandRestart(int client, int args)
 {
   g_AssignedRedTeam.Clear();
   g_AssignedBlueTeam.Clear();
+
   ServerCommand("mp_tournament_restart");
+
   return Plugin_Handled;
 }
 
@@ -285,16 +292,18 @@ public Action OnRoundStart(Event event, char[] eventName, bool dontBroadcast)
 
   CPrintToChatAll("%t", "tc_roundstart", redTeamName, blueTeamName, bestOf);
 
+  g_GameFinished = false;
+
   return Plugin_Handled;
 }
 
 public Action OnGameOver(Event event, char[] eventName, bool dontBroadcast)
 {
-  int    redScore  = GetTeamScore(view_as<int>(TFTeam_Red));
-  int    blueScore = GetTeamScore(view_as<int>(TFTeam_Blue));
+  int redScore  = GetTeamScore(view_as<int>(TFTeam_Red));
+  int blueScore = GetTeamScore(view_as<int>(TFTeam_Blue));
 
-  TFTeam winner    = TFTeam_Unassigned;
-  TFTeam loser     = TFTeam_Unassigned;
+  TFTeam winner = TFTeam_Unassigned;
+  TFTeam loser  = TFTeam_Unassigned;
 
   if (redScore > blueScore)
   {
@@ -311,6 +320,7 @@ public Action OnGameOver(Event event, char[] eventName, bool dontBroadcast)
   if (winner != TFTeam_Unassigned)
   {
     char teamName[32];
+
     if (winner == TFTeam_Red)
       g_CvarRedTeamName.GetString(teamName, sizeof(teamName));
     else
